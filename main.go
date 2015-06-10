@@ -5,8 +5,11 @@ import (
 	"net/http"
 	"time"
 	"encoding/json"
+	"github.com/op/go-logging"
 
 )
+
+var log = logging.MustGetLogger("example")
 
 type ServiceResponse struct {
 	Message   string
@@ -22,8 +25,8 @@ func ( this *ServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h(w, r)
 		return
 	}
-
-	fmt.Fprintf(w, "Unknown request")
+	log.Error("Invalid path")
+	fmt.Fprintf(w, "Invalid path")
 }
 
 
@@ -38,8 +41,10 @@ func status(w http.ResponseWriter, r *http.Request) {
 
 	if err==nil {
 		fmt.Fprintf(w, string(json_result))
+		log.Info("Request processed /status")
 	} else {
-		fmt.Fprintf(w, "Unknown error")
+		fmt.Fprintf(w, "JSON marshaling error!")
+		log.Error("JSON marshaling error!")
 	}
 
 }
@@ -61,7 +66,7 @@ func main() {
 		Handler: handler,
 	}
 
-
+	log.Info("Starting on :8000")
 	server.ListenAndServe()
 
 }
